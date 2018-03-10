@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lost In Madrid</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <script src="resources/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="js/index.js?v=1.2"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+    <script type="text/javascript">
+        if (screen.width <= 800) {
+            document.head.insertAdjacentHTML('beforeEnd', '<meta name="viewport" content="width=device-width, initial-scale=0.95, maximum-scale=1.0, user-scalable=0, user-scalable=no"/>');
+        }
+    </script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyA-cYGCy5xyn4C5hH0rv7iWbw4nNGqcU0E",
+            authDomain: "lostinmadrid-24ae6.firebaseapp.com",
+            databaseURL: "https://lostinmadrid-24ae6.firebaseio.com",
+            projectId: "lostinmadrid-24ae6",
+            storageBucket: "lostinmadrid-24ae6.appspot.com",
+            messagingSenderId: "93509060231"
+        };
+        firebase.initializeApp(config);
+    </script>
+
+    <script type="text/javascript">
+
+        var org_id = 0;
+        var service = "";
+        var appoint = "";
+        var appoint_m =new Array();
+        var miMapa_appoint = new Map();
+        var schedules = new Array();
+        var miMapa_sched = new Map();
+        var languages_m = new Array();
+        var miMapa_languages = new Map();
+        var services_m = new Array();
+        var miMapa_services = new Map();
+        var latitude = 0.0;
+        var longitude = 0.0;
+
+
+        function strMapToObj(strMap) {
+            let obj = Object.create(null);
+            for (let [k,v] of strMap) {
+                obj[k] = v;
+            }
+            return obj;
+        }
+
+        function generateId() {
+
+            console.log('generating ID...');
+
+            return firebase.database().ref('N_ORGANIZATIONS')
+                .once('value')
+                .then(function(snapshot) {
+                    org_id = parseInt(snapshot.val())+1;
+
+                    console.log(org_id);
+                    return firebase.database().ref('N_ORGANIZATIONS').set(org_id.toString()).then( () =>  {
+
+                        return org_id;
+                    });
+
+
+                });
+
+            
+        }
+
+        function writeOrganization() {
+
+            return generateId().then(function (resp) {
+
+
+                var n = document.getElementById("ong_name");
+                var phone = document.getElementById("ong_phone");
+                var address = document.getElementById("address");
+                var mail = document.getElementById("ong_email");
+                var postal = document.getElementById("zipcode");
+                var web = document.getElementById("website");
+                var district = document.getElementById("district");
+
+                service = document.getElementById("service");
+
+                org_id = resp.toString();
+
+                //Horarios de asistencia
+                schedules = Array.from(document.querySelectorAll('input[name="times[]"]'))
+                    .filter((checkbox) => checkbox.checked)
+                    .map((checkbox) => checkbox.value);
+
+                for (let i = 0; i<schedules.length; i++){
+                    miMapa_sched.set(i,schedules[i]);
+
+                }
+                //Cita requerida y como conseguirla
+                appoint = $('input[name="appointment"]:checked').val();
+
+                appoint_m = Array.from(document.querySelectorAll('input[name="appointments[]"]'))
+                    .filter((checkbox) => checkbox.checked)
+                    .map((checkbox) => checkbox.value);
+
+
+                for (let i = 0; i<appoint_m.length; i++){
+                    miMapa_appoint.set(i,appoint_m[i]);
+
+                }
+
+
+                //Idiomas
+                languages_m = Array.from(document.querySelectorAll('input[name="languages[]"]'))
+                    .filter((checkbox) => checkbox.checked)
+                    .map((checkbox) => checkbox.value);
+
+                for (let i = 0; i<languages_m.length; i++){
+                    miMapa_languages.set(i,languages_m[i]);
+
+                }
+                // Persona de contacto
+
+                var p_contact = document.getElementById("p_name");
+                var p_phone = document.getElementById("p_phone");
+                var p_mail = document.getElementById("p_email");
+
+
+                var others = document.getElementById("p_others");
+
+                //Servicios
+                services_m = Array.from(document.querySelectorAll('input[name="services[]"]'))
+                    .filter((checkbox) => checkbox.checked)
+                    .map((checkbox) => checkbox.value);
+
+                for (let i = 0; i<services_m.length; i++){
+                    miMapa_services.set(i,services_m[i]);
+
+                }
+                firebase.database().ref(`organizations/${org_id}`).set({
+                    id: org_id,
+                    name: n.value,
+                    phone: phone.value,
+                    address: address.value,
+                    mail: mail.value,
+                    web: web.value,
+                    postal_code: postal.value,
+                    district: district.value,
+                    schedule:strMapToObj(miMapa_sched) ,
+                    appointment: appoint,
+                    appointment_method: strMapToObj(miMapa_appoint),
+                    services: strMapToObj(miMapa_services),
+                    language: strMapToObj(miMapa_languages),
+                    other: others.value,
+                    p_name: p_contact.value,
+                    p_phone: p_phone.value,
+                    p_mail: p_mail.value
+
+                }).then(function () {
+                    geocodeAddress(geocoder);
+                }).then(function() {
+
+                    for(var i = 0; i < services_m.length; i++) {
+
+                        console.log(latitude);
+
+
+                        firebase.database().ref(`services/${services_m[i]}`).child(org_id).set({
+                            id: org_id,
+                            name: n.value,
+                            phone: phone.value,
+                            address: address.value,
+                            mail: mail.value,
+                            web: web.value,
+                            postal_code: postal.value,
+                            district: district.value,
+                            schedule: strMapToObj(miMapa_sched),
+                            appointment: appoint,
+                            appointment_method: strMapToObj(miMapa_appoint),
+                            services: strMapToObj(miMapa_services),
+                            language: strMapToObj(miMapa_languages),
+                            other: others.value,
+                            p_name: p_contact.value,
+                            p_phone: p_phone.value,
+                            p_mail: p_mail.value,
+                            latitude: latitude.toString(),
+                            longitude: longitude.toString()
+
+                        })
+
+                    }
+                });
+
+            });
+
+        }
+
+        function initMap() {
+
+            geocoder = new google.maps.Geocoder();
+
+            /*document.getElementById('submit').addEventListener('click', function() {
+                geocodeAddress(geocoder);
+            });*/
+        }
+
+
+        function meteLatLng(lat, lng, cadena) {
+
+            console.log(lat);
+            console.log(lng);
+
+            for (let i = 0; i < cadena.length; i++) {
+
+                firebase.database().ref(`services/${cadena[i]}`).child(org_id).child("latitude").set(lat.toString()).then(function () {
+
+                    firebase.database().ref(`services/${cadena[i]}`).child(org_id).child("longitude").set(lng.toString());
+
+                });
+            }
+        }
+
+
+        function geocodeAddress(geocoder) {
+
+
+            var address = document.getElementById('address').value;
+            geocoder.geocode({'address': address}, function (results, status) {
+                if (status === 'OK') {
+
+                    latitude = results[0].geometry.location.lat();
+                    longitude = results[0].geometry.location.lng();
+
+                    console.log(latitude, longitude);
+
+
+                    return firebase.database().ref(`organizations/${org_id}`).child("latitude").set(latitude.toString()).then(function () {
+
+                        return firebase.database().ref(`organizations/${org_id}`).child("longitude").set(longitude.toString()).then(function () {
+
+                            meteLatLng(latitude, longitude, services_m);
+
+                        });
+
+                    });
+
+
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        }
+
+
+
+
+
+
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-cYGCy5xyn4C5hH0rv7iWbw4nNGqcU0E&callback=initMap">
+    </script>
+
+</head>
+
+
+<body>
+
+
+<div id="barra_arriba"><img id="foto" src="resources/images/logo_lost_in_madrid.png"></div><br>
+<div id="cuerpo" class="container">
+
+    <h3>Comencemos con algo de información básica sobre la organización:</h3>
+
+    <fieldset>
+        <p><label for="ong_name">Nombre de la organización*:</label><br>
+            <input name="ong_name" id="ong_name" required></p>
+
+        <p><label for="ong_phone">Teléfono de la organización:</label><br>
+            <input type="tel" name="ong_phone" id="ong_phone" required></p>
+
+        <p><label for="ong_email">e-mail*:</label><br>
+            <input type="email" name="ong_email" id="ong_email" placeholder="mundomovimiento@gmail.com" required></p>
+
+        <p><label for="website">Sitio web:</label><br>
+            <input name="website" id="website" value="http://" placeholder="http://www.mundoenmovimiento.com"></p>
+
+        <p><label for="address">Dirección:</label><br>
+            <input name="address" id="address" placeholder="Calle Emilio Carrere 8 1ºA"></p>
+
+        <p><label for="zipcode">Código Postal:</label><br>
+            <input name="zipcode" id="zipcode" placeholder="28015"></p>
+
+        <p><label for="district">Distrito*:</label>
+            <select name="district" id="district">
+                <option value="none">Sin presencia física</option>
+                <option value="arganzuela">Arganzuela</option>
+                <option value="barajas">Barajas</option>
+                <option value="carabanchel">Carabanchel</option>
+                <option value="centro">Centro</option>
+                <option value="chamberi">Chamberí</option>
+                <option value="chamartin">Chamartin</option>
+                <option value="ciudad_lineal">Ciudad Lineal</option>
+                <option value="el_pardo">Fuencarral / El Pardo</option>
+                <option value="hortaleza">Hortaleza</option>
+                <option value="latina">Latina</option>
+                <option value="moncloa_aravaca">Moncloa / Aravaca</option>
+                <option value="moratalaz">Moratalaz</option>
+                <option value="p_vallecas">Puente de Vallecas</option>
+                <option value="retiro">Retiro</option>
+                <option value="salamanca">Salamanca</option>
+                <option value="san_blas">San Blas / Canillejas</option>
+                <option value="tetuan">Tetuan</option>
+                <option value="usera">Usera</option>
+                <option value="villa_vallecas">Villa de Vallecas</option>
+                <option value="vicalvaro">Vicálvaro</option>
+                <option value="villaverde">Villaverde</option>
+            </select></p>
+
+
+
+        <p>Horarios de atención (Puedes seleccionar más de uno):</p>
+        <div class="checkbox_estilizadas">
+            <div class="columnas">
+                <input type="checkbox" name="times[]" id="mornings" value="mañana" hidden>
+                <label for="mornings">Todas las mañanas</label><br>
+                <input type="checkbox" name="times[]" id="afternoons" value="tarde" hidden>
+                <label for="afternoons">Todas las tardes</label><br>
+                <input type="checkbox" name="times[]" id="nights" value="noche" hidden>
+                <label for="nights">Todas las noches</label><br>
+                <input type="checkbox" name="times[]" id="weekdays" value="entre semana" hidden>
+                <label for="weekdays">Entre semana</label><br>
+                <input type="checkbox" name="times[]" id="weekends" value="fines de semana" hidden>
+                <label for="weekends">Fines de Semana</label><br>
+                <input type="checkbox" name="times[]" id="24h" value="24h" hidden>
+                <label for="24h">24 horas</label><br>
+            </div></div>
+    </fieldset>
+
+    <h3>¿Cómo contactar? ¿Qué recursos/servicios ofrecéis?</h3>
+    <fieldset>
+        <p>¿Es necesario pedir cita?</p>
+
+        <p><input type="radio" name="appointment" id="appointment_yes" value="Sí">
+            <label for="appointment_yes">Si</label>&nbsp;
+            <input type="radio" name="appointment" id="appointment_no" value="No" checked>
+            <label for="appointment_no">No</label>
+        </p>
+
+        <div id="appointment_selector">
+            <p>¿Como se pide?</p>
+            <p><input type="checkbox" id="cont_telef" value="contacto_telefonico" name="appointments[]">
+                <label for="cont_telef">Contacto Telefónico</label>
+                <input type="checkbox" id="send_mail" value="enviar_mail" name="appointments[]">
+                <label for="send_mail">Enviando email</label>
+                <input type="checkbox" id="web_contact" value="contact_web" name="appointments[]">
+                <label for="web_contact">A través de la web</label>
+                <input type="checkbox" id="headquarters" value="headquarters" name="appointments[]">
+                <label for="headquarters">Visitando nuestra sede</label>
+                <!--TODO-->
+                <input type="checkbox" id="other" value="other" name="appointments[]">
+                <label for="other">Otro:</label></p>
+        </div>
+
+        <p>Servicios ofrecidos:</p>
+        <div class="checkbox_estilizadas">
+            <div class="columnas">
+                <input type="checkbox" name="services[]" id="alojamiento" value="alojamiento" hidden>
+                <label for="alojamiento">Alojamiento</label><br>
+                <input type="checkbox" name="services[]" id="comedor" value="comedor" hidden>
+                <label for="comedor">Comedor</label><br>
+                <input type="checkbox" name="services[]" id="comida" value="comida" hidden>
+                <label for="comida">Comida (cestas, etc.)</label><br>
+                <input type="checkbox" name="services[]" id="duchas" value="duchas" hidden>
+                <label for="duchas">Duchas públicas</label><br>
+                <input type="checkbox" name="services[]" id="ropa" value="ropa" hidden>
+                <label for="ropa">Ropa</label><br>
+                <input type="checkbox" name="services[]" id="material_escolar" value="material_escolar" hidden>
+                <label for="material_escolar">Material escolar</label><br>
+                <input type="checkbox" name="services[]" id="higiene" value="higiene" hidden>
+                <label for="higiene">Productos de higiene</label><br>
+                <input type="checkbox" name="services[]" id="clases_castellano" value="clases_castellano" hidden>
+                <label for="clases_castellano">Clases de castellano</label><br>
+                <input type="checkbox" name="services[]" id="idiomas" value="idiomas" hidden>
+                <label for="idiomas">Enseñanza de idiomas</label><br>
+                <input type="checkbox" name="services[]" id="apoyo_escolar" value="apoyo_escolar" hidden>
+                <label for="apoyo_escolar">Apoyo escolar</label><br>
+                <input type="checkbox" name="services[]" id="fp" value="fp" hidden>
+                <label for="fp">Formación profesional</label><br>
+                <input type="checkbox" name="services[]" id="informatica" value="informatica" hidden>
+                <label for="informatica">Clases de informática</label><br>
+                <input type="checkbox" name="services[]" id="otras_formaciones" value="otras_formaciones" hidden>
+                <label for="otras_formaciones">Otras formaciones</label><br>
+                <input type="checkbox" name="services[]" id="laboral" value="laboral" hidden>
+                <label for="laboral">Orientación laboral</label><br>
+                <input type="checkbox" name="services[]" id="legal" value="legal" hidden>
+                <label for="legal">Servicio legal</label><br>
+                <input type="checkbox" name="services[]" id="medico" value="medico" hidden>
+                <label for="medico">Atención médica general</label><br>
+                <input type="checkbox" name="services[]" id="vih" value="vih" hidden>
+                <label for="vih">VIH/Sida</label><br>
+                <input type="checkbox" name="services[]" id="adicciones" value="adicciones" hidden>
+                <label for="adicciones">Adicciones</label><br>
+                <input type="checkbox" name="services[]" id="dentista" value="dentista" hidden>
+                <label for="dentista">Dentista</label><br>
+                <input type="checkbox" name="services[]" id="oculista" value="oculista" hidden>
+                <label for="oculista">Oculista / gafas</label><br>
+                <input type="checkbox" name="services[]" id="vacunacion" value="vacunacion" hidden>
+                <label for="vacunacion">Vacunación</label><br>
+                <input type="checkbox" name="services[]" id="ginecologia" value="ginecologia" hidden>
+                <label for="ginecologia">Ginecologia</label><br>
+                <input type="checkbox" name="services[]" id="psicologica" value="psicologica" hidden>
+                <label for="psicologica">Atención psicológica</label><br>
+                <input type="checkbox" name="services[]" id="psiquiatrica" value="psiquiatrica" hidden>
+                <label for="psiquiatrica">Atención psiquiátrica</label><br>
+                <input type="checkbox" name="services[]" id="atencion_mujer" value="atencion_mujer" hidden>
+                <label for="atencion_mujer">Atención a la mujer</label><br>
+                <input type="checkbox" name="services[]" id="atencion_discapacidad" value="atencion_discapacidad" hidden>
+                <label for="atencion_discapacidad">Atención a personas con discapacidad</label><br>
+                <input type="checkbox" name="services[]" id="jovenes" value="jovenes" hidden>
+                <label for="jovenes">Jóvenes</label><br>
+                <input type="checkbox" name="services[]" id="atencion_infancia" value="atencion_infancia" hidden>
+                <label for="atencion_infancia">Atención a la infancia</label><br>
+                <input type="checkbox" name="services[]" id="atencion_familias" value="atencion_familias" hidden>
+                <label for="atencion_familias">Atención a familias</label><br>
+                <input type="checkbox" name="services[]" id="ocio" value="ocio" hidden>
+                <label for="ocio">Ocio y tiempo libre</label><br>
+                <input type="checkbox" name="services[]" id="deporte" value="deporte" hidden>
+                <label for="deporte">Deporte</label><br>
+                <input type="checkbox" name="services[]" id="cultura" value="cultura" hidden>
+                <label for="cultura">Acceso a la cultura</label><br>
+                <input type="checkbox" name="services[]" id="religion" value="religion" hidden>
+                <label for="religion">Religión</label><br>
+                <input type="checkbox" name="services[]" id="otro" value="otro" hidden>
+                <!--TODO-->
+                <label for="otro">Otro</label><br>
+            </div></div>
+
+
+        <p>Idiomas en los que se ofrecen los servicios:</p>
+        <div class="checkbox_estilizadas">
+            <div class="columnas">
+                <input type="checkbox" name="languages[]" id="castellano" value="castellano" hidden>
+                <label for="castellano">Castellano</label><br>
+                <input type="checkbox" name="languages[]" id="ingles" value="ingles" hidden>
+                <label for="ingles">Inglés</label><br>
+                <input type="checkbox" name="languages[]" id="frances" value="frances" hidden>
+                <label for="frances">Francés</label><br>
+                <input type="checkbox" name="languages[]" id="portugues" value="portugues" hidden>
+                <label for="portugues">Portugués</label><br>
+                <input type="checkbox" name="languages[]" id="italiano" value="italiano" hidden>
+                <label for="italiano">Italiano</label><br>
+                <input type="checkbox" name="languages[]" id="arabe" value="arabe" hidden>
+                <label for="arabe">Árabe</label><br>
+                <input type="checkbox" name="languages[]" id="farsi" value="farsi" hidden>
+                <label for="farsi">Farsi</label><br>
+                <input type="checkbox" name="languages[]" id="urdu" value="urdu" hidden>
+                <label for="urdu">Urdu</label><br>
+                <input type="checkbox" name="languages[]" id="kurdo_sorani" value="kurdo_sorani" hidden>
+                <label for="kurdo_sorani">Kurdo Sorani</label><br>
+                <input type="checkbox" name="languages[]" id="kurdo_kurmanji" value="kurdo_kurmanji" hidden>
+                <label for="kurdo_kurmanji">Kurdo Kurmanji</label><br>
+                <input type="checkbox" name="languages[]" id="chino_mandarin" value="chino_mandarin" hidden>
+                <label for="chino_mandarin">Chino mandarín</label><br>
+                <input type="checkbox" name="languages[]" id="polaco" value="polaco" hidden>
+                <label for="polaco">Polaco</label><br>
+                <input type="checkbox" name="languages[]" id="ucraniano" value="ucraniano" hidden>
+                <label for="ucraniano">Ucraniano</label><br>
+                <input type="checkbox" name="languages[]" id="bulgaro" value="bulgaro" hidden>
+                <label for="bulgaro">Búlgaro</label><br>
+                <input type="checkbox" name="languages[]" id="suajili" value="suajili" hidden>
+                <label for="suajili">Suajili</label><br>
+                <input type="checkbox" name="languages[]" id="hausa" value="hausa" hidden>
+                <label for="hausa">Hausa</label><br>
+                <input type="checkbox" name="languages[]" id="oromo" value="oromo" hidden>
+                <label for="oromo">Oromo</label><br>
+                <input type="checkbox" name="languages[]" id="mandinga" value="mandinga" hidden>
+                <label for="mandinga">Mandinga</label><br>
+                <input type="checkbox" name="languages[]" id="bengali" value="bengali" hidden>
+                <label for="bengali">Bengalí</label><br>
+                <input type="checkbox" name="languages[]" id="otro_idioma" value="otro_idioma" hidden>
+                <!--TODO-->
+                <label for="otro_idioma">Otro:</label><br>
+            </div></div>
+    </fieldset>
+
+
+    <h3>Persona de Contacto</h3>
+
+    <fieldset>
+        <p><label for="p_name">Nombre de la persona de contacto*:</label><br>
+            <input name="p_name" id="p_name" required></p>
+
+        <p><label for="p_phone">Teléfono*:</label><br>
+            <input type="tel" name="p_phone" id="p_phone" required></p>
+
+        <p><label for="p_email">e-mail*:</label><br>
+            <input type="email" name="p_email" id="p_email" placeholder="mundoenmovimiento@gmail.com" required></p>
+    </fieldset>
+
+    <h3>Por último, si tienes alguna necesidad especial, recomendación...</h3>
+    <textarea name="comentario" id="p_others"></textarea><br><br>
+
+
+    <button class="boton_enviar" id="boton_enviar" value="Enviar" onclick="writeOrganization()">Enviar</button>
+</div>
+
+
+</body>
+</html>

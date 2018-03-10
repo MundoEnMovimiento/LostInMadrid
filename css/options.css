@@ -1,0 +1,36 @@
+
+.languages img{
+	background-color: #8CDEFA;
+	border-radius: 15px;
+	padding:5px;
+}
+.health  img{
+	background-color: #F27A69;
+	border-radius: 15px;
+	padding:5px;
+}
+.basics  img{
+	background-color: #FE9844;
+	border-radius: 15px;
+	padding:5px;
+}
+.education  img{
+	background-color: #C9A1F1;
+	border-radius: 15px;
+	padding:5px;
+}
+.services  img{
+	background-color: #FFE614;
+	border-radius: 15px;
+	padding:5px;
+}
+.leisure_culture  img{
+	background-color: #FCADF6;
+	border-radius: 15px;
+	padding:5px;
+}
+.info  img{
+	background-color: #9C7134;
+	border-radius: 15px;
+	padding:5px;
+}

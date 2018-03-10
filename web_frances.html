@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>Lost In Madrid</title>
+		<meta name="description" content="Blueprint: Horizontal Slide Out Menu" />
+		<meta name="keywords" content="horizontal, slide out, menu, navigation, responsive, javascript, images, grid" />
+		<meta name="author" content="Codrops" />
+		 <link rel="icon" href="Iconos/logo_favicon_grande.ico">
+		<link rel="stylesheet" type="text/css" href="css/default.css" />
+		<link rel="stylesheet" type="text/css" href="css/component.css" />
+		<link rel="stylesheet" type="text/css" href="css/mypath.css" />
+		<link rel="stylesheet" type="text/css" href="css/header.css" />
+		<link rel="stylesheet" type="text/css" href="css/options.css" />
+		<script src="js/modernizr.custom.js"></script>
+		<script src="resources/jquery-3.2.1.js"></script>
+		<script src="js/colores.js"></script>
+		<script src="js/firebase.js"></script>
+
+
+		<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+		<script>
+				if (screen.width <= 800) {
+			document.head.insertAdjacentHTML('beforeEnd', '<meta name="viewport" content="width=device-width, initial-scale=0.95, maximum-scale=1.0, user-scalable=0, user-scalable=no"/>');
+			}
+
+			// Initialize Firebase
+			var config = {
+			apiKey: "AIzaSyA-cYGCy5xyn4C5hH0rv7iWbw4nNGqcU0E",
+			authDomain: "lostinmadrid-24ae6.firebaseapp.com",
+			databaseURL: "https://lostinmadrid-24ae6.firebaseio.com",
+			projectId: "lostinmadrid-24ae6",
+			storageBucket: "lostinmadrid-24ae6.appspot.com",
+			messagingSenderId: "93509060231"
+			};
+			firebase.initializeApp(config);
+		</script>
+
+		<style>
+
+
+			.gm-style div div div div div div div div{
+				color: black;
+			}
+
+			.gm-style div div div div div div div div a{
+				color: royalblue;
+			}
+
+		</style>
+		
+	</head>
+	<body>
+		<header id="header_id">
+    		<div class="Log">
+      			<img class="Logo" alt="Logo Lost in Madrid" src="Iconos/logo_lost_in_madrid.png"  >
+    		</div>
+   			<div class="Lengua">
+      			<a href="index.html" ><img class="Espana" alt="Espana" src="Iconos/espana2.png"  ></a>
+      			<a href="web_ingles.html" ><img class="UK" alt="UK" src="Iconos/UK.png"  ></a>
+      			<a href="web_frances.html" ><img class="Francia" alt="fr" src="Iconos/Francia.png"  ></a>
+    		</div>
+  		</header>
+		<div id = "expander">
+		<div class="container">
+			<div class="main">
+				<nav class="cbp-hsmenu-wrapper" id="cbp-hsmenu-wrapper">
+					<div class="cbp-hsinner">
+						<ul class="cbp-hsmenu">
+							<li class="home" onclick="generateLatLong('alojamiento','#BDFB9A');">
+								<a href="#"><img src="Iconos/Alojamiento/Alojamiento.png" class="image" id="home_id"/><span>Hébergement</span></a>
+							</li>
+							<li onclick="cambiaAzul();"> <a href="#"><img src="Iconos/Idiomas/PRINCIPAL.png" class="image" id="languages_id"/><span>Langues</span></a>
+	            				<ul class="cbp-hssubmenu">
+					              <li  onclick="generateLatLong('clases_castellano','#8CDEFA'); " class="languages" id="spanish"><a href="#"><img src="Iconos/Idiomas/Clases_Espanol.png"/><span>Classes d'espagnol</span></a></li>
+					              <li  onclick="generateLatLong('idiomas','#8CDEFA'); " class="languages" id="languages_lessons"><a href="#"><img src="Iconos/Idiomas/Ensenanza_idiomas.png"/><span>Enseignement des langues</span></a></li>
+					            </ul>
+				        	</li>
+				       
+					        <li onclick="cambiaRojo();"><a href="#"><img src="Iconos/Salud/Atencion_medica.png" class="image" id="health_id"/><span >La santé</span></a>
+					            <ul class="cbp-hssubmenu">
+					              <li onclick="generateLatLong('medico','#F27A69');" class="health" id="general_health"><a href="#"><img src="Iconos/Salud/Atencion_medica.png"/><span>Soins médicaux généraux</span></a></li>
+					              <li onclick="generateLatLong('vih','#F27A69');" class="health" id="VIH"><a href="#"><img src="Iconos/Salud/Sida.png"/><span>VIH</span></a></li>
+					              <li onclick="generateLatLong('adicciones','#F27A69');" class="health" id="addiction"><a href="#"><img src="Iconos/Salud/Adicciones.png"/><span>Dépendances</span></a></li>
+					              <li onclick="generateLatLong('dentista','#F27A69');" class="health" id="dentist"><a href="#"><img src="Iconos/Salud/Dentista.png"/><span>Dentiste</span></a></li>
+					              <li onclick="generateLatLong('oculista','#F27A69');" class="health" id="glasses"><a href="#"><img src="Iconos/Salud/Oculista.png"/><span>Oculiste</span></a></li>
+					              <li onclick="generateLatLong('vacunacion','#F27A69');" class="health" id="vaccination"><a href="#"><img src="Iconos/Salud/Vacunas.png"/><span>Vaccination</span></a></li>
+					              <li onclick="generateLatLong('ginecologia','#F27A69');" class="health" id="gynecology"><a href="#"><img src="Iconos/Salud/Ginecologia.png"/><span>Gynécologie</span></a></li>
+					              <li onclick="generateLatLong('psicologica','#F27A69');" class="health" id="psychology"><a href="#"><img src="Iconos/Salud/Atencion_psicologica.png"/><span>Attention psychologique</span></a></li>
+					              <li onclick="generateLatLong('psiquiatrica','#F27A69');" class="health" id="psychiatry"><a href="#"><img src="Iconos/Salud/Atencion_psiquiatrica.png"/><span>Attention psychiatrique</span></a></li>
+					            </ul>
+					        </li>
+					       
+					        <li onclick="cambiaNaranja();"><a href="#"><img src="Iconos/Productos_basicos/PRINCIPAL.png" class="image" id="basics_id"/><span>Produits de base</span></a>
+						        <ul class="cbp-hssubmenu">
+						          <li onclick="generateLatLong('comida','#FE9844');" class="basics" id="food"><a href="#"><img src="Iconos/Productos_basicos/Comida.png"/><span>Nourriture</span></a></li>
+						          <li onclick="generateLatLong('higiene','#FE9844');" class="basics" id="hygiene"><a href="#"><img src="Iconos/Productos_basicos/Productos_de_higiene.png"/><span>Hygiène</span></a></li>
+						          <li onclick="generateLatLong('ropa','#FE9844');" class="basics" id="clothes"><a href="#"><img src="Iconos/Productos_basicos/Ropa.png"/><span>Vêtements</span></a></li>
+						        </ul>
+					        </li>
+					       
+					        <li onclick="cambiaMorado();"><a href="#"><img src="Iconos/Formacion/PRINCIPAL.png" class="image" id="education_id"/><span>Éducation</span></a>
+					          	<ul class="cbp-hssubmenu">
+						          <li onclick="generateLatLong('apoyo_escolar','#C9A1F1');" class="education" id="academic_support"><a href="#"><img src="Iconos/Formacion/Apoyo_escolar.png"/><span>Aide scolaire</span></a></li>
+						          <li onclick="generateLatLong('material_escolar','#C9A1F1');" class="education" id="school_supply"><a href="#"><img src="Iconos/Formacion/Material_escolar.png"/><span>Matériel scolaire</span></a></li>
+						          <li onclick="generateLatLong('informatica','#C9A1F1');" class="education" id="computing"><a href="#"><img src="Iconos/Formacion/Informatica.png"/><span>Cours d'informatique</span></a></li>
+						          <li onclick="generateLatLong('fp','#C9A1F1');" class="education" id="trainning"><a href="#"><img src="Iconos/Formacion/formacion_profesional.png"/><span>Formation professionnelle</span></a></li>
+						          <li onclick="generateLatLong('otras_formaciones','#C9A1F1');" class="education" id="other_trainning"><a href="#"><img src="Iconos/Formacion/otras_formaciones.png"/><span>Autres formations</span></a></li>
+					              <li onclick="generateLatLong('laboral','#C9A1F1');" class="education" id="work"><a href="#"><img src="Iconos/Formacion/orientacion_laboral.png"/><span>Orientation professionnelle</span></a></li>
+					          	</ul>
+					        </li>
+					       
+					        <li onclick="cambiaAmarillo();"><a href="#"><img src="Iconos/Servicios/PRINCIPAL.png" class="image" id="services_id"/><span>Services</span></a>
+					          <ul class="cbp-hssubmenu">
+					            <li onclick="generateLatLong('comedor','#FFE614');" class="services" id="dinning"><a href="#"><img src="Iconos/Servicios/Comedor.png"/><span>Salles à manger</span></a></li>
+					            <li onclick="generateLatLong('duchas','#FFE614');" class="services" id="showers"><a href="#"><img src="Iconos/Servicios/Duchas.png"/><span>Douches publiques</span></a></li>
+					            <li onclick="generateLatLong('legal','#FFE614');" class="services" id="legal"><a href="#"><img src="Iconos/Servicios/Servicio_legal.png"/><span>Service juridique</span></a></li>
+					          </ul>
+					        </li>
+					       
+					        <li onclick="generateLatLong('religion','#658EC5');" class="religion">
+								<a href="#"><img src="Iconos/Religion/Religion.png" class="image" id="religion_id"/><span>Religion</span></a>
+							</li>
+					        <li onclick="cambiaRosa();"><a href="#"><img src="Iconos/Ocio_cultura/PRINCIPAL.png" class="image" id="leisure_culture_id"/><span>Loisirs </span></a>
+					          <ul class="cbp-hssubmenu">
+					            <li onclick="generateLatLong('ocio','#FCADF6');" class="leisure_culture" id="leisure"><a href="#"><img src="Iconos/Ocio_cultura/Ocio.png"/><span>Loisirs et temps libre</span></a></li>
+					            <li onclick="generateLatLong('deporte','#FCADF6');" class="leisure_culture" id="sport"><a href="#"><img src="Iconos/Ocio_cultura/Deportes.png"/><span>Sports</span></a></li>
+					            <li onclick="generateLatLong('cultura','#FCADF6');" class="leisure_culture" id="culture"><a href="#"><img src="Iconos/Ocio_cultura/Cultura.png"/><span>Culture</span></a></li>
+					          </ul>
+					        </li>
+					      
+					        <li onclick="cambiaMarron();"><a href="#"><img src="Iconos/Atencion/PRINCIPAL.png" class="image" id="info_id"/><span>Service client</span></a>
+					          <ul class="cbp-hssubmenu">
+					            <li onclick="generateLatLong('atencion_mujer','#9C7134');" class="info" id="women"><a href="#"><img src="Iconos/Atencion/Atencion_mujeres.png"/><span>Attention portée aux les femmes</span></a></li>
+					            <li onclick="generateLatLong('atencion_discapacidad','#9C7134');" class="info" id="disable"><a href="#"><img src="Iconos/Atencion/DISCAPACIDADES.png"/><span>Handicapée</span></a></li>
+					            <li onclick="generateLatLong('jovenes','#9C7134');" class="info" id="youth"><a href="#"><img src="Iconos/Atencion/ATENCION_JOVENES.png"/><span>Jeunes</span></a></li>
+					            <li onclick="generateLatLong('atencion_infancia','#9C7134');" class="info" id="infant"><a href="#"><img src="Iconos/Atencion/atencion_ninos.png"/><span>Protection de l'enfance</span></a></li>
+					            <li onclick="generateLatLong('atencion_familias','#9C7134');" class="info" id="families"><a href="#"><img src="Iconos/Atencion/atencion_familias.png"/><span>Attention portée aux les familles</span></a></li>
+					          </ul>
+					        </li>
+							
+						</ul>
+					</div>
+				</nav>
+			</div>
+		</div>
+		</div>
+
+		<div style="clear:both"></div>
+
+		<div id="map">
+
+		</div>
+
+		<footer>
+			Êtes-vous une association et souhaitez collaborer?<a href="formulario.html"> Cliquez ici!</a>
+		</footer>
+
+
+		<script async defer
+				src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-cYGCy5xyn4C5hH0rv7iWbw4nNGqcU0E&callback=initMap">
+		</script>
+
+		<script src="js/cbpHorizontalSlideOutMenu.min.js"></script>
+		<script>
+			var menu = new cbpHorizontalSlideOutMenu( document.getElementById( 'cbp-hsmenu-wrapper' ) );
+		</script>
+	</body>
+</html>

@@ -1,0 +1,44 @@
+header{
+  margin:auto;
+  margin-top:0px;
+  width:100%;
+  height: 150px;
+  background-color: #BDFB9A;
+  }
+  
+.Logo{
+   height:130px ;
+   display: block;
+   margin:auto;
+}
+
+.Espana{
+  margin: auto;
+  display: inline;
+  height:19px ;
+  width: 30px;  float: right;
+  margin-left: 3px;
+  margin-right: 3px;
+  padding-bottom: 2px;
+}
+.UK{
+  margin: auto;
+  float: right;
+  display: inline;
+  margin-left: 6px;
+  height:16px ;
+  width: 30px;
+}
+.Lengua{
+  float: right;
+  margin:auto;
+  display: inline;
+}
+
+.Francia{
+  margin: auto;
+  float: right;
+  display: inline;
+  height:16px ;
+  width: 30px;
+}
